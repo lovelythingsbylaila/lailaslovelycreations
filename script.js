@@ -174,10 +174,12 @@ Please confirm my order before I send payment. Thank you! ♡`;
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        _subject: `New Laila's Lovely Creations order from ${name}`,
-        customer_name: name,
-        customer_phone: phone,
-        order_details: message
+  _subject: `New Laila's Lovely Creations order from ${name}`,
+  customer_name: name,
+  customer_email: document.getElementById('customer-email').value.trim(),
+  customer_phone: phone,
+  order_details: message
+})
       })
     })
       .then(response => {
