@@ -204,7 +204,8 @@ Please confirm my order before I send payment. Thank you! ♡`;
         _subject: `New Laila's Lovely Creations order from ${name}`,
         customer_name: name,
         customer_phone: phone,
-        order_details: message
+        order_details: message + '\n\nCONFIRM ORDER:\n',
+confirm_order_link: 'https://script.google.com/macros/s/AKfycbxmKFlv8ebHJaLuafyK0Dl99zII2qY8pVPoYY4ca8qqF25E2SSXvZBUjQjTM3Pv2BvM/exec'
       })
     })
       .then(response => {
