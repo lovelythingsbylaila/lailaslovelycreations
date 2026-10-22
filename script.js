@@ -104,11 +104,38 @@ function updateTotals() {
 }
 function money(n) { return '$' + n.toFixed(2); }
 
-document.getElementById('add-item').addEventListener('click', () => addItem());
-document.querySelectorAll('.add-style').forEach(button => button.addEventListener('click', () => {
-  addItem(button.dataset.style);
-  document.getElementById('order').scrollIntoView({behavior:'smooth'});
-}));
+// Button actions: bind directly to each style button and keep a delegated
+// fallback for browsers/pages where the buttons are replaced dynamically.
+function handleStyleChoice(event, button) {
+  event.preventDefault();
+  const chosenStyle = button.dataset.style;
+  if (!['keyring', 'carabiner', 'rod'].includes(chosenStyle)) return;
+  addItem(chosenStyle);
+  const orderSection = document.getElementById('order');
+  if (orderSection) orderSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const newItem = itemsEl.lastElementChild;
+  if (newItem) newItem.querySelector('.saying-input')?.focus({ preventScroll: true });
+}
+
+document.querySelectorAll('.add-style').forEach(button => {
+  button.type = 'button';
+  button.addEventListener('click', event => handleStyleChoice(event, button));
+});
+document.addEventListener('click', event => {
+  const target = event.target instanceof Element ? event.target : null;
+  if (!target) return;
+  const styleButton = target.closest('.add-style');
+  if (styleButton && !styleButton.dataset.styleBoundFallback) {
+    // Dynamically inserted buttons get the same behavior.
+    styleButton.dataset.styleBoundFallback = 'true';
+    handleStyleChoice(event, styleButton);
+    return;
+  }
+  if (target.closest('#add-item')) {
+    event.preventDefault();
+    addItem();
+  }
+});
 addItem();
 
 form.addEventListener('submit', event => {
@@ -174,12 +201,10 @@ Please confirm my order before I send payment. Thank you! ♡`;
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-  _subject: `New Laila's Lovely Creations order from ${name}`,
-  customer_name: name,
-  customer_email: document.getElementById('customer-email').value.trim(),
-  customer_phone: phone,
-  order_details: message
-})
+        _subject: `New Laila's Lovely Creations order from ${name}`,
+        customer_name: name,
+        customer_phone: phone,
+        order_details: message
       })
     })
       .then(response => {
